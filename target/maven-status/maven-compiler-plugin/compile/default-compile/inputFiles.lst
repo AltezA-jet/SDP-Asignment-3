@@ -1,8 +1,10 @@
+C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\cipher\SpaceShiftCipher.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\Main.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\notification\EncryptedNotification.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\notification\MarketingNotification.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\notification\Notification.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\notification\ScheduledBatchNotification.java
+C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\notification\SpaceShiftEncryptedNotification.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\notification\UrgentNotification.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\sender\EmailMessageSender.java
 C:\Users\altez\Documents\proging\java\SDP-Asignment-3\src\main\java\com\example\notification\sender\KafkaEventSender.java

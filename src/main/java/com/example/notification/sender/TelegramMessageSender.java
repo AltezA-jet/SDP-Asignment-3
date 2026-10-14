@@ -34,8 +34,8 @@ public class TelegramMessageSender implements MessageSender {
                 .uri(URI.create("https://api.telegram.org/bot"
                         + botToken + "/sendMessage"))
                 .timeout(Duration.ofSeconds(15))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .header("Content-Type", "application/json; charset=UTF-8")
+                .POST(HttpRequest.BodyPublishers.ofString(json, java.nio.charset.StandardCharsets.UTF_8))
                 .build();
 
         try {

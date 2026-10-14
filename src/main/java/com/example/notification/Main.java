@@ -1,4 +1,3 @@
-
 package com.example.notification;
 
 import com.example.notification.sender.*;
@@ -55,8 +54,20 @@ public class Main {
                 continue;
             }
 
-            System.out.print("Recipient: ");
-            String recipient = scanner.nextLine();
+            
+            String recipient;
+
+            if (choice.equals("4")) {
+                recipient = System.getenv("TELEGRAM_CHAT_ID");
+
+                if (recipient == null || recipient.isBlank()) {
+                    System.out.println("TELEGRAM_CHAT_ID is not configured.");
+                    continue;
+                }
+            } else {
+                System.out.print("Recipient: ");
+                recipient = scanner.nextLine();
+}
 
             System.out.print("Title: ");
             String title = scanner.nextLine();
@@ -69,6 +80,7 @@ public class Main {
             System.out.println("2. Urgent");
             System.out.println("3. Marketing");
             System.out.println("4. Encrypted");
+            System.out.println("5. Own encryption");
             System.out.print("Choose type: ");
 
             String type = scanner.nextLine();
@@ -96,6 +108,7 @@ public class Main {
                     );
                     continue;
                 }
+                case "5" -> notification = new SpaceShiftEncryptedNotification(sender);
                 default -> {
                     System.out.println("Invalid notification type.");
                     continue;
