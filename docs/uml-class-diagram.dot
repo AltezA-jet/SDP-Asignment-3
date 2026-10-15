@@ -1,0 +1,82 @@
+digraph Bridge {
+  graph [rankdir=LR, fontname="Helvetica", labelloc=t, fontsize=20, nodesep=0.35, ranksep=1.3, splines=true, pad=0.3,
+         label="Bridge Pattern: Multi-Channel Notification Gateway (UML Class Diagram)\n "];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10];
+
+  Notification [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#cfe2ff">
+      <TR><TD><I>«Abstraction»</I><BR/><B><I>Notification</I></B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT"># sender : MessageSender</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ send(recipient, title, body) : boolean {abstract}<BR/>+ setSender(sender : MessageSender)<BR/>+ getSender() : MessageSender</TD></TR>
+    </TABLE>>];
+
+  MessageSender [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#d1e7dd">
+      <TR><TD><I>«Implementor»</I><BR/><I>«interface»</I><BR/><B>MessageSender</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ sendMessage(recipient, title, body) : boolean<BR/>+ isAvailable() : boolean<BR/>+ getChannelName() : String</TD></TR>
+    </TABLE>>];
+
+  Urgent [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#e7f0ff">
+      <TR><TD><I>«Refined Abstraction»</I><BR/><B>UrgentNotification</B></TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">- fallbackSender : MessageSender</TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">+ send(...) : boolean</TD></TR>
+    </TABLE>>];
+  Marketing [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#e7f0ff">
+      <TR><TD><I>«Refined Abstraction»</I><BR/><B>MarketingNotification</B></TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">+ send(...) : boolean</TD></TR>
+    </TABLE>>];
+  Encrypted [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#e7f0ff">
+      <TR><TD><I>«Refined Abstraction»</I><BR/><B>EncryptedNotification</B></TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">- secretKey : SecretKeySpec (AES-256-GCM)</TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">+ send(...) : boolean</TD></TR>
+    </TABLE>>];
+  SpaceShiftEnc [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#e7f0ff">
+      <TR><TD><I>«Refined Abstraction»</I><BR/><B>SpaceShiftEncryptedNotification</B></TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">- cipher : SpaceShiftCipher</TD></TR>
+      <HR/><TR><TD ALIGN="LEFT">+ send(...) : boolean</TD></TR>
+    </TABLE>>];
+  Batch [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#e7f0ff">
+      <TR><TD><I>«Refined Abstraction»</I><BR/><B>ScheduledBatchNotification</B></TD></TR>
+      <HR/><TR><TD ALIGN="LEFT" BALIGN="LEFT">- successfulCount : int<BR/>- failedCount : int</TD></TR>
+      <HR/><TR><TD ALIGN="LEFT" BALIGN="LEFT">+ send(...) : boolean<BR/>+ sendBatch(recipients, title, body) : boolean</TD></TR>
+    </TABLE>>];
+  Cipher [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#f8f9fa">
+      <TR><TD><B>SpaceShiftCipher</B><BR/>(helper, not part of the Bridge)</TD></TR>
+      <HR/><TR><TD ALIGN="LEFT" BALIGN="LEFT">+ encrypt(plain) : String<BR/>+ decrypt(cipher) : String</TD></TR>
+    </TABLE>>];
+
+  Telegram [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#eaf6ee"><TR><TD><I>«Concrete Implementor»</I><BR/><B>TelegramMessageSender</B></TD></TR></TABLE>>];
+  Email    [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#eaf6ee"><TR><TD><I>«Concrete Implementor»</I><BR/><B>EmailMessageSender</B></TD></TR></TABLE>>];
+  Sms      [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#eaf6ee"><TR><TD><I>«Concrete Implementor»</I><BR/><B>SmsMessageSender</B></TD></TR></TABLE>>];
+  Kafka    [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#eaf6ee"><TR><TD><I>«Concrete Implementor»</I><BR/><B>KafkaEventSender</B></TD></TR></TABLE>>];
+  Push     [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#eaf6ee"><TR><TD><I>«Concrete Implementor»</I><BR/><B>PushNotificationSender</B></TD></TR></TABLE>>];
+
+
+  // THE BRIDGE
+  Notification -> MessageSender [dir=both, arrowtail=odiamond, arrowhead=vee, penwidth=2.5, color="#b02a37",
+      label="  «Bridge»\n  has-a (sender)  ", fontcolor="#b02a37", fontsize=12];
+
+  // generalization: Refined Abstractions -> Abstraction
+  edge [arrowhead=empty, color="#0d6efd", style=solid];
+  Urgent -> Notification; Marketing -> Notification; Encrypted -> Notification; SpaceShiftEnc -> Notification; Batch -> Notification;
+
+  // realization: Concrete Implementors -> Implementor (drawn to the right)
+  edge [dir=back, arrowtail=empty, arrowhead=none, style=dashed, color="#198754"];
+  MessageSender -> Telegram; MessageSender -> Email; MessageSender -> Sms; MessageSender -> Kafka; MessageSender -> Push;
+
+  // extra associations
+  edge [dir=forward, style=dashed, arrowhead=vee, arrowtail=none, color="#6c757d", fontcolor="#6c757d", constraint=false];
+  Urgent -> MessageSender [label="fallbackSender"];
+  edge [dir=back, arrowtail=vee, arrowhead=none, constraint=true];
+  Cipher -> SpaceShiftEnc [label="«uses»"];
+}

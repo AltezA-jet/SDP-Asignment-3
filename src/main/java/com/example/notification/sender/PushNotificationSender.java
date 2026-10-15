@@ -1,8 +1,35 @@
 package com.example.notification.sender;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 public class PushNotificationSender implements MessageSender {
 
+    /** Способ показать push-уведомление пользователю. */
+    @FunctionalInterface
+    public interface PopupDisplay {
+        void show(String recipient, String title, String body);
+    }
+
+    private final PopupDisplay display;
     private boolean available = true;
+
+    public PushNotificationSender() {
+        this(PushNotificationSender::showSwingPopup);
+    }
+
+    public PushNotificationSender(PopupDisplay display) {
+        if (display == null) {
+            throw new IllegalArgumentException("Display cannot be null");
+        }
+
+        this.display = display;
+    }
 
     @Override
     public boolean sendMessage(String recipient, String title, String body) {
@@ -11,13 +38,13 @@ public class PushNotificationSender implements MessageSender {
             return false;
         }
 
-        System.out.println("=== Push Notification ===");
-        System.out.println("Device token: " + recipient);
-        System.out.println("Title: " + title);
-        System.out.println("Message: " + body);
-        System.out.println("=========================");
-
-        return true;
+        try {
+            display.show(recipient, title, body);
+            return true;
+        } catch (RuntimeException e) {
+            System.out.println("Failed to show push notification: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -32,5 +59,28 @@ public class PushNotificationSender implements MessageSender {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    private static void showSwingPopup(String recipient, String title, String body) {
+        if (GraphicsEnvironment.isHeadless()) {
+            throw new HeadlessException("Push popup needs a graphical environment");
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane pane = new JOptionPane(
+                    "Device token: " + recipient + "\n\n" + body,
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            JDialog dialog = pane.createDialog(title);
+            dialog.setModal(false);
+            dialog.setAlwaysOnTop(true);
+            dialog.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentHidden(ComponentEvent e) {
+                    dialog.dispose();
+                }
+            });
+            dialog.setVisible(true);
+        });
     }
 }

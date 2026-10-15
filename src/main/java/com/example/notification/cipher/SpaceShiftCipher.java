@@ -13,8 +13,8 @@ import java.util.Map;
  *
  * Числа: подряд идущие цифры считаются одним числом. Число переводится в двоичную
  * запись, делится на начало (длина / 2, округление вниз) и конец; конец
- * переворачивается, части склеиваются и результат переводится обратно в десятичное.
- * В шифртексте перед таким числом стоит префикс 'd'. Ведущие нули теряются.
+ * переворачивается, части склеиваются. В шифртексте число записывается в двоичном виде
+ * с префиксом 'd' (например, 13 -> d1110). Ведущие нули исходного числа теряются.
  *
  * Формат шифртекста: токены (буквы и числа), идущие подряд, разделяются символом '|'.
  * Пробелы и знаки препинания (печатные ASCII-символы, кроме букв, цифр и '|')
@@ -38,14 +38,18 @@ public final class SpaceShiftCipher {
     }
 
     /**
-     * Преобразование числа: бинарная запись, начало (длина / 2) остаётся,
-     * конец переворачивается. Применённое дважды, возвращает исходное число.
+     * Преобразование числа: двоичная запись, начало (длина / 2) остаётся,
+     * конец переворачивается. Возвращает двоичную строку той же длины.
+     * Применённое дважды (с переводом строки обратно в число), возвращает исходное число.
      */
-    static BigInteger transformNumber(BigInteger n) {
+    static String transformNumber(BigInteger n) {
         String bits = n.toString(2);
         int half = bits.length() / 2;
-        String end = new StringBuilder(bits.substring(half)).reverse().toString();
-        return new BigInteger(bits.substring(0, half) + end, 2);
+        String end = new StringBuilder(bits.substring(half))
+                .reverse()
+                .toString();
+
+        return bits.substring(0, half) + end;
     }
 
     private static boolean isLetter(char ch) {
@@ -129,7 +133,13 @@ public final class SpaceShiftCipher {
                 }
                 BigInteger value = new BigInteger(cipher.substring(digitsStart, i));
                 if (isNumber) {
-                    sb.append(transformNumber(value));
+                    String bits = cipher.substring(digitsStart, i);
+                    if (!bits.matches("[01]+")) {
+                        throw new IllegalArgumentException(
+                                "Number token must be binary: 'd" + bits + "'");
+                    }
+                    String restored = transformNumber(new BigInteger(bits, 2));
+                    sb.append(new BigInteger(restored, 2));
                 } else {
                     Character letter = table.get(value);
                     if (letter == null) throw new IllegalArgumentException("Unknown value: " + value);
